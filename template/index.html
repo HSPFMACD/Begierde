@@ -57,7 +57,7 @@
             };
             // Send a POST request to the predefined endpoint
             $.ajax({
-                url: "http://localhost:8000/option",
+                url: "http://192.168.62.215:8000/option",
                 method: "POST",
                 data: JSON.stringify(keywords.option),
                 contentType: 'application/json',
@@ -76,7 +76,7 @@
 
     function getKeywords() {
         $.ajax({
-                url: "http://localhost:8000/keywords",
+                url: "http://192.168.62.215:8000/keywords",
                 method: "GET",
                 success: function(response) {
                     console.log(response)
