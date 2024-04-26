@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Choose Your Path</title>
+    <style>
+        body {
+            font-family: Helvetica, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .header {
+            background-color: #ffffff;
+            color: #242424;
+            padding: 100px 0;
+            text-align: center;
+        }
+        .button-container {
+            text-align: center;
+            margin-top: 10px;
+        }
+        .button {
+            background-color: #ff00e1;
+        
+            color: #fff;
+            padding: 30px;
+            margin: 15px;
+            border: none;
+            border-radius: 100%;
+            cursor: pointer;
+            font-size: 30px;
+        }
+        .button:hover {
+            background-color: #6500b3;
+        }
+    </style>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script type="text/javascript">
+      $(document).ready(function() {
+        // initial keywords aufrufen nachdem die page "ready" ist.
+        getKeywords();
+
+        // alle 10 Sekunden nach neuen "Optionen" nachsehen.
+        var intervalId = window.setInterval(function(){
+            getKeywords();
+        }, 5000);
+        
+        // 
+        $(".button").on("click", function() {
+            var keywords = {
+                "option": "option"+$(this).attr('id').replace(/button/, '')
+            };
+            // Send a POST request to the predefined endpoint
+            $.ajax({
+                url: "http://localhost:8000/option",
+                method: "POST",
+                data: JSON.stringify(keywords.option),
+                contentType: 'application/json',
+                dataType: 'json',
+                success: function(response) {
+                    $(this).text("success");
+                },
+                error: function(xhr, status, error) {
+                    $(this).text("error");
+                    // Handle errors here
+                }
+            });
+        });
+
+      });
+
+    function getKeywords() {
+        $.ajax({
+                url: "http://localhost:8000/keywords",
+                method: "GET",
+                success: function(response) {
+                    console.log(response)
+                    $.each(response, function(key, value) {
+                    // Prüfen, ob ein Button mit der entsprechenden ID existiert
+                    var button = $('#button' + key.split('-')[1]);
+                    if (button.length) {
+                        // Text des Buttons aktualisieren
+                        button.text(value);
+                    }
+                });
+                },
+                error: function(xhr, status, error) {
+                    $("#button1").text("Request jgjgfj");
+                    // Handle errors here
+                }
+            });
+    }
+    </script>
+</head>
+<body>
+    <div class="header">
+        <h1>Choose Your Path</h1>
+    </div>
+    <div class="button-container">
+        <button id="button1" class="button">Option 1</button>
+        <button id="button2" class="button">Option 2</button>
+        <button id="button3" class="button">Option 3</button>
+    </div>
+</body>
+</html>
