@@ -35,35 +35,45 @@
             box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.3); /* Shadow added to buttons */
             font-family: Courier, monospace; /* Same font as body */
         }
-        .button:hover {
+        .button:active {
             background-color: #6500b3;
+        }
+
+        .button:disabled,
+        .button[disabled]{
+            background-color: #232323;
+            color: #8f8a8a;
         }
     </style>
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script type="text/javascript">
       $(document).ready(function() {
-        // initial keywords aufrufen nachdem die page "ready" ist.
-        getKeywords();
 
-        // alle 10 Sekunden nach neuen "Optionen" nachsehen.
+        var webserverUrl = "http://localhost:8000"
+        // initial keywords aufrufen nachdem die page "ready" ist.
+        getKeywords(webserverUrl);
+
+        // alle 0.5 Sekunden nach neuen "Optionen" nachsehen.
         var intervalId = window.setInterval(function(){
-            getKeywords();
-        }, 5000);
+            getKeywords(webserverUrl);
+        }, 500);
         
         // 
         $(".button").on("click", function() {
             var keywords = {
                 "option": "option"+$(this).attr('id').replace(/button/, '')
             };
+            $('.button').prop('disabled', true);
             // Send a POST request to the predefined endpoint
             $.ajax({
-                url: "http://192.168.62.215:8000/option",
+                url: webserverUrl + "/option",
                 method: "POST",
                 data: JSON.stringify(keywords.option),
                 contentType: 'application/json',
                 dataType: 'json',
                 success: function(response) {
                     $(this).text("success");
+                 
                 },
                 error: function(xhr, status, error) {
                     $(this).text("error");
@@ -74,23 +84,32 @@
 
       });
 
-    function getKeywords() {
+    function getKeywords(webserverUrl) {
+        // url
+       
         $.ajax({
-                url: "http://192.168.62.215:8000/keywords",
+                url: webserverUrl + "/keywords",
                 method: "GET",
                 success: function(response) {
-                    console.log(response)
+                    //console.log(response)
                     $.each(response, function(key, value) {
                     // Prüfen, ob ein Button mit der entsprechenden ID existiert
                     var button = $('#button' + key.split('-')[1]);
-                    if (button.length) {
+                    if (button.text() === value) {
+                        // keine neuen Optionen vorhanden.
+                    } else {
                         // Text des Buttons aktualisieren
-                        button.text(value);
+                        if (button.length) {
+                            console.log(response)
+                            button.text(value);
+                            $('.button').prop('disabled', false);
+                        }
                     }
+                   
                 });
                 },
                 error: function(xhr, status, error) {
-                    $("#button1").text("Request jgjgfj");
+                    $("#button1").text("error");
                     // Handle errors here
                 }
             });

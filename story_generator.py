@@ -1,7 +1,9 @@
 import json
+import time
 from yattag import Doc
 from openai import OpenAI
 from datetime import datetime
+
 
 current_options_buttons = {}
 current_story_object = {
@@ -29,7 +31,7 @@ doc, tag, text = Doc().tagtext()
 
 def requestInitialStory():
     try:
-        client = OpenAI(api_key = "xxx")
+        client = OpenAI(api_key = "xx")
 
         response = client.chat.completions.create(
             model="gpt-3.5-turbo-0125",
@@ -91,6 +93,7 @@ def concatStoryToTextFile(furtherStory):
     printer.write(furtherStory)
     printer.close()
     addNewTextToHTML(furtherStory)
+    updateJSONFile(furtherStory)
 
 
 def addNewTextToHTML(text):
@@ -113,17 +116,21 @@ def extractKeywords():
     current_options_buttons = {"option-1": current_story_object["option1"]["keyword"], "option-2": current_story_object["option2"]["keyword"], "option-3": current_story_object["option3"]["keyword"]}
     return current_options_buttons
 
-def createHTML():
-    # Create a new HTML document
-    doc, tag, text = Doc().tagtext()
+def createJSONFile():
+    data = []
+    with open('story.json', 'w') as json_file:
+        json.dump(data, json_file, indent=4)   
 
-    # Start HTML document
-    doc.asis('<!DOCTYPE html>')
-       
 
-    # Render HTML document
-    html_content = doc.getvalue()
+def updateJSONFile(new_storyphrase):
+    with open('story.json', 'r') as json_file:
+        data = json.load(json_file)
+    
+    new_data = {
+        "timestamp": str(round(time.time() * 1000)),
+        "storyphrase": new_storyphrase
+    }
+    data.append(new_data)
 
-    # Write HTML content to a file
-    with open('story.html', 'w') as file:
-        file.write(html_content)
+    with open('story.json', 'w') as json_file:
+        json.dump(data, json_file, indent=4)

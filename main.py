@@ -15,7 +15,7 @@ if __name__ == "__main__":
     f.write("Datum: " + dateFormat + "\n")
     f.close()   
 
-    story_generator.createHTML()
+    story_generator.createJSONFile()
 
     printFurtherStory(requestInitialStory())
     # Starte Threads für die Konsoleingabe und den Webserver
